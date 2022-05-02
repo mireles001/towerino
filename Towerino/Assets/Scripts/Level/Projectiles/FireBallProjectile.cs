@@ -4,10 +4,14 @@ namespace Towerino
 {
     public class FireBallProjectile : BaseProjectile
     {
-        [SerializeField] private float _fireAheadMultiplier = 0.5f;
-        [SerializeField] private ParticleSystem _fireTrail = null;
-        [SerializeField] private ParticleSystem _smokeTrail = null;
-        [SerializeField] private GameObject _fireGround = null;
+        [SerializeField]
+        private float _fireAheadMultiplier = 0.5f;
+        [SerializeField]
+        private ParticleSystem _fireTrail = null;
+        [SerializeField]
+        private ParticleSystem _smokeTrail = null;
+        [SerializeField]
+        private GameObject _fireGround = null;
 
         private Rigidbody _rigidBody;
 

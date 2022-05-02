@@ -734,6 +734,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraWrapper: {fileID: 1460939138}
+  _headStartDuration: 1
+  _waveEndWaitDuration: 1
+  _hits:
+  - {fileID: 8300000, guid: 5406076bd0a2ee045b70cfe58aefd891, type: 3}
+  - {fileID: 8300000, guid: 9024ad5bf140a6c4299985a59ad35bcc, type: 3}
   _towerBallista:
     TowerType: 0
     Name: Ballista Tower
@@ -752,9 +757,6 @@ MonoBehaviour:
     Prefab: {fileID: 2771617152845664424, guid: 6ce02dd1d299ace4db3347424c12c00e, type: 3}
     BuyPrice: 300
     SellPrice: 150
-  _hits:
-  - {fileID: 8300000, guid: 5406076bd0a2ee045b70cfe58aefd891, type: 3}
-  - {fileID: 8300000, guid: 9024ad5bf140a6c4299985a59ad35bcc, type: 3}
 --- !u!114 &362981160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -767,25 +769,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb9f6b6934c57284d9ecc72c566cf6bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _levelWaveText: {fileID: 1118600221}
-  _moneyText: {fileID: 1917173348}
-  _hpMetterPrefab: {fileID: 0}
+  _panelTweenDuration: 0.18
   _quitPanel: {fileID: 1301419528}
   _buySellPanel: {fileID: 1054515552}
-  _panelTweenDuration: 0.18
-  _buy: {fileID: 291277527}
+  _buyPanel: {fileID: 0}
   _buyBallista: {fileID: 423210540}
   _ballistaPrice: {fileID: 1483395709}
   _buyCannon: {fileID: 183267293}
   _cannonPrice: {fileID: 871986687}
   _buyFirebomb: {fileID: 913488872}
   _firebombPrice: {fileID: 1901387479}
-  _sell: {fileID: 897713783}
+  _sellPanel: {fileID: 0}
   _ballistaImage: {fileID: 1949626726}
   _cannonImage: {fileID: 1055139871}
   _firebombImage: {fileID: 1081728068}
   _sellPrice: {fileID: 828483297}
   _sellTowerName: {fileID: 1726799461}
+  _health: {fileID: 0}
+  _levelWaveText: {fileID: 1118600221}
+  _moneyText: {fileID: 1917173348}
 --- !u!114 &362981161
 MonoBehaviour:
   m_ObjectHideFlags: 0

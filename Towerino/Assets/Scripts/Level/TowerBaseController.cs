@@ -7,10 +7,14 @@ namespace Towerino
         public bool HasTower { get { return _currentTower != null; } }
         public TowerType TowerType { get { return _currentTower.TowerType; } }
 
-        [SerializeField] private GameObject _baseMesh = null;
-        [SerializeField] private GameObject _selectFx = null;
-        [SerializeField] private BoxCollider _collider = null;
-        [SerializeField] private float _colliderSizeIncreased = 2;
+        [SerializeField]
+        private GameObject _baseMesh = null;
+        [SerializeField]
+        private GameObject _selectFx = null;
+        [SerializeField]
+        private BoxCollider _collider = null;
+        [SerializeField]
+        private float _colliderSizeIncreased = 2;
 
         private TowerController _currentTower;
         private Vector3 _center, _size;

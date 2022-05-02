@@ -7,8 +7,10 @@ namespace Towerino
     {
         public Vector2 FadeInOutDuration { get { return _fadeInOutDuration; } }
 
-        [SerializeField] private CanvasGroup _faderCanvas = null;
-        [SerializeField, Tooltip("X: Fade in duration, Y: Fade out duration")] private Vector2 _fadeInOutDuration = Vector2.zero;
+        [SerializeField]
+        private CanvasGroup _faderCanvas = null;
+        [SerializeField, Tooltip("X: Fade in duration, Y: Fade out duration")]
+        private Vector2 _fadeInOutDuration = Vector2.zero;
 
         private bool _isFading;
         private float _waitTime, _currentTime, _start, _end;

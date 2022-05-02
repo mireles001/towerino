@@ -7,15 +7,24 @@ namespace Towerino
     {
         public TowerType TowerType { get { return _towerType; } }
 
-        [SerializeField] private TowerType _towerType;
-        [SerializeField] private float _attackRange = 5;
-        [SerializeField] private float _attackInterval = 2;
-        [SerializeField] private GameObject _projectilePrefab = null;
-        [SerializeField] private Transform _projectileAnchor = null;
-        [SerializeField, Tooltip("Required horizontal movement")] private Transform _yRotator = null;
-        [SerializeField, Tooltip("Optional vertical movement")] private Transform _xRotator = null;
-        [SerializeField] private float _idleSpeed = 100f;
-        [SerializeField] private float _aimSpeed = 10f;
+        [SerializeField]
+        private TowerType _towerType;
+        [SerializeField]
+        private float _attackRange = 5;
+        [SerializeField]
+        private float _attackInterval = 2;
+        [SerializeField]
+        private GameObject _projectilePrefab = null;
+        [SerializeField]
+        private Transform _projectileAnchor = null;
+        [SerializeField, Tooltip("Required horizontal movement")]
+        private Transform _yRotator = null;
+        [SerializeField, Tooltip("Optional vertical movement")]
+        private Transform _xRotator = null;
+        [SerializeField]
+        private float _idleSpeed = 100f;
+        [SerializeField]
+        private float _aimSpeed = 10f;
 
         private bool _ready;
         private float _intervalTimer;

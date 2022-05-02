@@ -8,26 +8,48 @@ namespace Towerino
     {
         public bool IsBuySellModalOpen { get; private set; }
 
-        [SerializeField] private GameObject _quitPanel = null;
-        [SerializeField] private GameObject _buySellPanel = null;
-        [SerializeField] private float _panelTweenDuration = 0.25f;
-        [SerializeField, Space, Header("Buy Panel")] private GameObject _buy = null;
-        [SerializeField] private Button _buyBallista = null;
-        [SerializeField] private TMP_Text _ballistaPrice = null;
-        [SerializeField] private Button _buyCannon = null;
-        [SerializeField] private TMP_Text _cannonPrice = null;
-        [SerializeField] private Button _buyFirebomb = null;
-        [SerializeField] private TMP_Text _firebombPrice = null;
-        [SerializeField, Space, Header("Sell Panel")] private GameObject _sell = null;
-        [SerializeField] private GameObject _ballistaImage = null;
-        [SerializeField] private GameObject _cannonImage = null;
-        [SerializeField] private GameObject _firebombImage = null;
-        [SerializeField] private TMP_Text _sellPrice = null;
-        [SerializeField] private TMP_Text _sellTowerName = null;
-        [SerializeField, Space, Header("Life and Timer")] private CanvasGroup _health = null;
-        [SerializeField] private TMP_Text _levelWaveText = null;
-        [SerializeField] private TMP_Text _moneyText = null;
+        [SerializeField]
+        private float _panelTweenDuration = 0.25f;
 
+        [SerializeField, Space, Header("Main Wrappers")]
+        private GameObject _quitPanel = null;
+        [SerializeField]
+        private GameObject _buySellPanel = null;
+
+        [SerializeField, Space, Header("Buy Panel")]
+        private GameObject _buyPanel = null;
+        [SerializeField]
+        private Button _buyBallista = null;
+        [SerializeField]
+        private TMP_Text _ballistaPrice = null;
+        [SerializeField]
+        private Button _buyCannon = null;
+        [SerializeField]
+        private TMP_Text _cannonPrice = null;
+        [SerializeField]
+        private Button _buyFirebomb = null;
+        [SerializeField]
+        private TMP_Text _firebombPrice = null;
+
+        [SerializeField, Space, Header("Sell Panel")]
+        private GameObject _sellPanel = null;
+        [SerializeField]
+        private GameObject _ballistaImage = null;
+        [SerializeField]
+        private GameObject _cannonImage = null;
+        [SerializeField]
+        private GameObject _firebombImage = null;
+        [SerializeField]
+        private TMP_Text _sellPrice = null;
+        [SerializeField]
+        private TMP_Text _sellTowerName = null;
+
+        [SerializeField, Space, Header("Life and Timer")]
+        private CanvasGroup _health = null;
+        [SerializeField]
+        private TMP_Text _levelWaveText = null;
+        [SerializeField]
+        private TMP_Text _moneyText = null;
 
         private bool _quitToggle, _quitToggleTweening;
         private GameController _main;
@@ -43,11 +65,6 @@ namespace Towerino
             _buyBallista.onClick.AddListener(delegate { BuyButtonHandler(TowerType.ballistaTower); });
             _buyCannon.onClick.AddListener(delegate { BuyButtonHandler(TowerType.cannonTower); });
             _buyFirebomb.onClick.AddListener(delegate { BuyButtonHandler(TowerType.fireBombTower); });
-        }
-
-        private void Update()
-        {
-            _moneyText.text = $"${_main.PlayerMoney}";
         }
 
         public GameUIController StartUp(GameController main)
@@ -88,8 +105,8 @@ namespace Towerino
         {
             if (towerBase.HasTower)
             {
-                _buy.SetActive(false);
-                _sell.SetActive(true);
+                _buyPanel.SetActive(false);
+                _sellPanel.SetActive(true);
                 TowerData data = (TowerData)_main.GetTowerData(towerBase.TowerType);
 
                 _ballistaImage.SetActive(data.TowerType == TowerType.ballistaTower);
@@ -101,8 +118,8 @@ namespace Towerino
             }
             else
             {
-                _sell.SetActive(false);
-                _buy.SetActive(true);
+                _sellPanel.SetActive(false);
+                _buyPanel.SetActive(true);
             }
 
             if (!IsBuySellModalOpen)
@@ -162,6 +179,11 @@ namespace Towerino
         public void UpdateHealthMeter(int currentHelth)
         {
 
+        }
+
+        public void UpdateMoney(int val)
+        {
+            _moneyText.text = $"${val}";
         }
 
         public void UpdateLevelText(string val)

@@ -4,9 +4,12 @@ namespace Towerino
 {
     public class MenuController : MonoBehaviour
     {
-        [SerializeField] private GameObject _camera = null;
-        [SerializeField] private RectTransform _firstTimeFader = null;
-        [SerializeField] private RectTransform _title = null;
+        [SerializeField]
+        private GameObject _camera = null;
+        [SerializeField]
+        private RectTransform _firstTimeFader = null;
+        [SerializeField]
+        private RectTransform _title = null;
 
         private bool _tweening;
 

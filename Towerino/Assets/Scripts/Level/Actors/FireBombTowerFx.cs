@@ -4,7 +4,8 @@ namespace Towerino
 {
     public class FireBombTowerFx : MonoBehaviour, ICallableTowerFx
     {
-        [SerializeField] private Animator _catapultAnimator = null;
+        [SerializeField]
+        private Animator _catapultAnimator = null;
 
         private int _animFire = Animator.StringToHash("fire");
 

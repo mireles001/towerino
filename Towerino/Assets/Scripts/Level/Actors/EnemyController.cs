@@ -7,15 +7,24 @@ namespace Towerino
     {
         public bool ReachedDestination { get; private set; }
 
-        [SerializeField] private int _rewardPerKill = 50;
-        [SerializeField] private float _hp = 1;
-        [SerializeField] private float _speed = 1;
-        [SerializeField] private float _reachedDuration = 0.33f;
-        [SerializeField] private float _deathDuration = 1;
-        [SerializeField] private Transform _visualAsset = null;
-        [SerializeField] private NavMeshAgent _agent = null;
-        [SerializeField] private MeshRenderer _renderer = null;
-        [SerializeField] private Color _damageColor = Color.red;
+        [SerializeField]
+        private int _rewardPerKill = 50;
+        [SerializeField]
+        private float _hp = 1;
+        [SerializeField]
+        private float _speed = 1;
+        [SerializeField]
+        private float _reachedDuration = 0.33f;
+        [SerializeField]
+        private float _deathDuration = 1;
+        [SerializeField]
+        private Transform _visualAsset = null;
+        [SerializeField]
+        private NavMeshAgent _agent = null;
+        [SerializeField]
+        private MeshRenderer _renderer = null;
+        [SerializeField]
+        private Color _damageColor = Color.red;
 
         private int _cutoffHeight, _baseColor;
         private float _maxHp;
@@ -66,6 +75,8 @@ namespace Towerino
 
         public void TurnOn(Vector3 destination, NavigationArea navMeshArea)
         {
+            gameObject.SetActive(true);
+
             for (int i = 0; i < _sharedMaterials.Length; i++)
             {
                 _sharedMaterials[i].SetFloat(_cutoffHeight, 0);
@@ -73,6 +84,7 @@ namespace Towerino
             }
 
             _hp = _maxHp;
+            ReachedDestination = false;
             _collider.enabled = true;
             _visualAsset.localScale = Vector3.zero;
             _agent.areaMask = 1 << NavMesh.GetAreaFromName("Nothing");
@@ -92,9 +104,6 @@ namespace Towerino
             _agent.enabled = true;
             _agent.destination = destination;
 
-            gameObject.SetActive(true);
-            Debug.Log($"Creating {gameObject.name} ({gameObject.GetInstanceID()})");
-
             LeanTween.scale(_visualAsset.gameObject, Vector3.one, 0.25f).setEase(LeanTweenType.easeOutQuad);
         }
 
@@ -102,10 +111,8 @@ namespace Towerino
         {
             _agent.isStopped = true;
             _agent.enabled = _collider.enabled = false;
-            //gameObject.SetActive(false);
-            //GameMaster.Instance.Gameplay.ActivePoolingSystem.ReturnObject(gameObject);
-
-            Destroy(gameObject);
+            gameObject.SetActive(false);
+            GameMaster.Instance.Gameplay.ActivePoolingSystem.ReturnObject(gameObject);
         }
 
         public EnemyController SetReachedDestination(bool val)

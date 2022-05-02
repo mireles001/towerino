@@ -4,7 +4,8 @@ namespace Towerino
 {
     public class DestinationController : MonoBehaviour
     {
-        [SerializeField] private LevelController _levelController = null;
+        [SerializeField]
+        private LevelController _levelController = null;
 
         private void OnTriggerEnter(Collider other)
         {

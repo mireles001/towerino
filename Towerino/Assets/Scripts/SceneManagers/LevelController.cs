@@ -22,12 +22,16 @@ namespace Towerino
             public NavigationArea navMeshArea;
         }
 
-        [SerializeField] private Transform _destination;
-        [SerializeField] private float _headStartDuration = 5;
-        [SerializeField] private float _endOfWaveWait = 3;
-        [SerializeField] private Wave[] _enemyWaves = new Wave[0];
-        [SerializeField, Space] private MeshRenderer[] _navPathRenderers = new MeshRenderer[0];
-        [SerializeField] private ScenarioConfigSO _lightConfiguration = null;
+        [SerializeField]
+        private int _levelStartMoney = 100;
+        [SerializeField]
+        private Transform _destination;
+        [SerializeField]
+        private Wave[] _enemyWaves = new Wave[0];
+        [SerializeField, Space]
+        private MeshRenderer[] _navPathRenderers = new MeshRenderer[0];
+        [SerializeField]
+        private ScenarioConfigSO _lightConfiguration = null;
 
         private int _currentWaveIndex, _health, _activeEnemyCounter;
         private bool _headStartTimerRunning, _waveActive, _waveCleared;
@@ -46,6 +50,7 @@ namespace Towerino
                 if (_lightConfiguration != null) GameMaster.Instance.Gameplay.ApplyLightConfig(_lightConfiguration);
 
                 GameMaster.Instance.Gameplay.SetCurrentLevel(this);
+                GameMaster.Instance.Gameplay.SetPlayerMoney(_levelStartMoney);
                 GameMaster.Instance.Gameplay.UI.UpdateLevelText($"{GameMaster.Instance.CurrentLevel}-1");
                 Invoke("StartNextWave", 2); // Lets give a breather to our players...
             }
@@ -58,7 +63,7 @@ namespace Towerino
             if (_headStartTimerRunning)
             {
                 _headStartTimer -= Time.deltaTime;
-                GameMaster.Instance.Gameplay.UI.UpdateHeadStartTimer(_headStartTimer / _headStartDuration);
+                GameMaster.Instance.Gameplay.UI.UpdateHeadStartTimer(_headStartTimer / GameMaster.Instance.Gameplay.HeadStartDuration);
                 if (_headStartTimer <= 0)
                 {
                     GameMaster.Instance.Gameplay.UI.HideHeadStartTimer();
@@ -76,7 +81,7 @@ namespace Towerino
 
                 if (_waveCleared)
                 {
-                    if (_waveTimer >= _endOfWaveWait)
+                    if (_waveTimer >= GameMaster.Instance.Gameplay.WaveEndWaitDuration)
                     {
                         // TODO: Send UI first
                         StartNextWave();
@@ -126,7 +131,7 @@ namespace Towerino
         private void StartHeadStartCountDown()
         {
             _headStartTimerRunning = true;
-            _headStartTimer = _headStartDuration;
+            _headStartTimer = GameMaster.Instance.Gameplay.HeadStartDuration;
 
             GameMaster.Instance.Gameplay.UI.ShowHeadStartTimer();
         }
@@ -146,12 +151,9 @@ namespace Towerino
 
         private void SpawnEnemy(Enemy enemyData)
         {
-            Debug.Log($"SpawnEnemy type: {enemyData.gameObjectPrefab.name}");
-            //EnemyController enemy = GameMaster.Instance.Gameplay.ActivePoolingSystem.GetObject(enemyData.gameObjectPrefab).GetComponent<EnemyController>();
-            //enemy.transform.SetPositionAndRotation(enemyData.spawnPoint.position, Quaternion.identity);
-            //enemy.TurnOn(_destination.position, enemyData.navMeshArea);
-
-            Instantiate(enemyData.gameObjectPrefab, enemyData.spawnPoint.position, Quaternion.identity).GetComponent<EnemyController>().TurnOn(_destination.position, enemyData.navMeshArea);
+            EnemyController enemy = GameMaster.Instance.Gameplay.ActivePoolingSystem.GetObject(enemyData.gameObjectPrefab).GetComponent<EnemyController>();
+            enemy.transform.SetPositionAndRotation(enemyData.spawnPoint.position, Quaternion.identity);
+            enemy.TurnOn(_destination.position, enemyData.navMeshArea);
 
             _activeEnemyCounter++;
         }

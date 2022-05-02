@@ -5,19 +5,30 @@ namespace Towerino
 {
     public class GameController : MonoBehaviour
     {
-        public int PlayerMoney { get; private set; } = 10000;
+        public float HeadStartDuration { get { return _headStartDuration; } }
+        public float WaveEndWaitDuration { get { return _waveEndWaitDuration; } }
         public PoolingSystem ActivePoolingSystem { get; private set; }
         public GameUIController UI { get { return _ui; } }
         public LevelController CurrentLevel { get { return _currentLevel; } }
         public TowerBaseController CurrentTowerSelection { get; private set; }
 
-        [SerializeField] private GameObject _cameraWrapper = null;
-        [SerializeField] private TowerData _towerBallista;
-        [SerializeField] private TowerData _towerCannonBall;
-        [SerializeField] private TowerData _towerFireBomb;
-        [SerializeField] private AudioClip[] _hits = new AudioClip[0];
+        [SerializeField]
+        private GameObject _cameraWrapper = null;
+        [SerializeField]
+        private float _headStartDuration = 5;
+        [SerializeField]
+        private float _waveEndWaitDuration = 3;
+        [SerializeField, Tooltip("Attack hit shuffled sounds")]
+        private AudioClip[] _hits = new AudioClip[0];
+        [SerializeField, Space, Header("Tower Prefabs")]
+        private TowerData _towerBallista;
+        [SerializeField]
+        private TowerData _towerCannonBall;
+        [SerializeField]
+        private TowerData _towerFireBomb;
 
         private bool _paused;
+        private int _playerMoney;
         private Vector3 _cameraWrapperBasePosition;
         private Vector3 _cameraWrapperMovePosition;
         private Camera _camera;
@@ -77,6 +88,12 @@ namespace Towerino
                     }
                 }
             }
+        }
+
+        public void SetPlayerMoney(int startUpMoney)
+        {
+            _playerMoney = startUpMoney;
+            UI.UpdateMoney(_playerMoney);
         }
 
         public void GotoMenu()
@@ -166,9 +183,10 @@ namespace Towerino
         {
             TowerData data = (TowerData)GetTowerData(towerType);
 
-            if (CurrentTowerSelection.HasTower || PlayerMoney < data.BuyPrice) return;
+            if (CurrentTowerSelection.HasTower || _playerMoney < data.BuyPrice) return;
 
-            PlayerMoney -= data.BuyPrice;
+            _playerMoney -= data.BuyPrice;
+            UI.UpdateMoney(_playerMoney);
             CurrentTowerSelection.SetTower(ActivePoolingSystem.GetObject(data.Prefab).GetComponent<TowerController>());
             UI.CloseBuySell();
         }
@@ -178,7 +196,8 @@ namespace Towerino
             if (!CurrentTowerSelection.HasTower) return;
 
             TowerData data = (TowerData)GetTowerData(CurrentTowerSelection.TowerType);
-            PlayerMoney += data.SellPrice;
+            _playerMoney += data.SellPrice;
+            UI.UpdateMoney(_playerMoney);
             UI.RewardMoney(data.SellPrice, CurrentTowerSelection.GetHUDPosition());
             CurrentTowerSelection.UnsetTower();
             UI.CloseBuySell();
@@ -186,8 +205,8 @@ namespace Towerino
 
         public void EnemyReward(int reward, Vector3 enemyPosition)
         {
-            PlayerMoney += reward;
-
+            _playerMoney += reward;
+            UI.UpdateMoney(_playerMoney);
             UI.RewardMoney(reward, enemyPosition);
         }
 

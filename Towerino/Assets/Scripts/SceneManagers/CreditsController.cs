@@ -4,8 +4,10 @@ namespace Towerino
 {
     public class CreditsController : MonoBehaviour
     {
-        [SerializeField] private Transform _squire = null;
-        [SerializeField] private float _spinSpeed = 10;
+        [SerializeField]
+        private Transform _squire = null;
+        [SerializeField]
+        private float _spinSpeed = 10;
 
         private bool _tweening;
 

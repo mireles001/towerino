@@ -4,7 +4,8 @@ namespace Towerino
 {
     public class CannonTowerFx : MonoBehaviour, ICallableTowerFx
     {
-        [SerializeField] private ParticleSystem _sparksFx = null;
+        [SerializeField]
+        private ParticleSystem _sparksFx = null;
         public void ProjectileReady()
         {
             _sparksFx.Play();

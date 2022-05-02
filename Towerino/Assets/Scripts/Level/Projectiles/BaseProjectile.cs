@@ -5,16 +5,25 @@ namespace Towerino
 {
     public class BaseProjectile : MonoBehaviour
     {
-        [SerializeField] protected ProjectileType _type = ProjectileType.ballista;
-        [SerializeField] protected float _impactDamage = 2;
-        [SerializeField, Tooltip("If zero damage is applied entirely upon direct hit")] protected float _damageRadius = 1;
-        [SerializeField] protected float _speed = 1;
-        [SerializeField] protected float _turnOffProjectileDuration = 0.15f;
+        [SerializeField]
+        protected ProjectileType _type = ProjectileType.ballista;
+        [SerializeField]
+        protected float _impactDamage = 2;
+        [SerializeField, Tooltip("If zero damage is applied entirely upon direct hit")]
+        protected float _damageRadius = 1;
+        [SerializeField]
+        protected float _speed = 1;
+        [SerializeField]
+        protected float _turnOffProjectileDuration = 0.15f;
 
-        [SerializeField] private float _autoKillTimer = 5;
-        [SerializeField] private Transform _visualObject = null;
-        [SerializeField] private TrailRenderer _trailFx = null;
-        [SerializeField] private ParticleSystem _impactFx = null;
+        [SerializeField]
+        private float _autoKillTimer = 5;
+        [SerializeField]
+        private Transform _visualObject = null;
+        [SerializeField]
+        private TrailRenderer _trailFx = null;
+        [SerializeField]
+        private ParticleSystem _impactFx = null;
 
         private bool _fired, _hitDetected;
         private int _tweeningId;
