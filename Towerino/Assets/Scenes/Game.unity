@@ -772,14 +772,14 @@ MonoBehaviour:
   _panelTweenDuration: 0.18
   _quitPanel: {fileID: 1301419528}
   _buySellPanel: {fileID: 1054515552}
-  _buyPanel: {fileID: 0}
+  _buyPanel: {fileID: 291277527}
   _buyBallista: {fileID: 423210540}
   _ballistaPrice: {fileID: 1483395709}
   _buyCannon: {fileID: 183267293}
   _cannonPrice: {fileID: 871986687}
   _buyFirebomb: {fileID: 913488872}
   _firebombPrice: {fileID: 1901387479}
-  _sellPanel: {fileID: 0}
+  _sellPanel: {fileID: 897713783}
   _ballistaImage: {fileID: 1949626726}
   _cannonImage: {fileID: 1055139871}
   _firebombImage: {fileID: 1081728068}
