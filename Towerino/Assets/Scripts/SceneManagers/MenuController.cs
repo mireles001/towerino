@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Towerino
 {
+    // Main title menu scene controller
     public class MenuController : MonoBehaviour
     {
         [SerializeField]
@@ -13,6 +14,7 @@ namespace Towerino
 
         private bool _tweening;
 
+        // We start with a FadeOut
         private void Awake()
         {
             GameMaster.Instance.Fader.FadeOut();
@@ -20,6 +22,8 @@ namespace Towerino
             if (GameMaster.Instance.GameInitialized) Destroy(_firstTimeFader.gameObject);
             else
             {
+                // If this is the first time we run the game (it is not coming back from another scene)
+                // we make an fade in animation using an Image UI object in this scene canvas.
                 _firstTimeFader.gameObject.SetActive(true);
                 LeanTween.alpha(_firstTimeFader, 0, 2f).setOnComplete(() => { Destroy(_firstTimeFader.gameObject); });
             }
@@ -30,6 +34,8 @@ namespace Towerino
             GameMaster.Instance.Initialize();
         }
 
+        // Using LeanTween plugin to do some visual tweening in camera wrapper and title to make this flying movement
+        // animation. Looks bulky but its pretty straigh forward
         public void GotoGame()
         {
             if (_tweening) return;

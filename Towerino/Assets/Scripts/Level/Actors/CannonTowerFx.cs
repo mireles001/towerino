@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Towerino
 {
+    // Component that makes the fuse gets on fire when cannon ball is ready!
     public class CannonTowerFx : MonoBehaviour, ICallableTowerFx
     {
         [SerializeField]

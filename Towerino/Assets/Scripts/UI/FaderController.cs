@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Towerino
 {
+    // Fader object controller class.
+    // In charge of tweening in and out an image to cover up screen.
+    // It receives an action to be called as a callback once tweening is done.
     public class FaderController : MonoBehaviour
     {
         public Vector2 FadeInOutDuration { get { return _fadeInOutDuration; } }
@@ -18,6 +21,8 @@ namespace Towerino
         private Action _cbAction;
         private enum FadeState { inactive, fadeOut, fadeIn }
 
+        // Initial fade phase that receives and stores a callback action
+        // It simple sets a boolean for the Update function do its magic.
         public void FadeIn(Action cbAction = null)
         {
             if (_isFading) return;
@@ -59,7 +64,9 @@ namespace Towerino
 
             if (_currentTime >= _waitTime) FadeCompleted();
         }
-
+        
+        // FadeIn or FadeOut will always end up here.
+        // Here we invoke our callback if we just finished fading in.
         private void FadeCompleted()
         {
             if (_state == FadeState.fadeOut) gameObject.SetActive(false);

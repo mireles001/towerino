@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace Towerino
 {
+    // Projectiles shot by towers controller. Handles the movement, hit validation and damage calculation upon hit.
     public class BaseProjectile : MonoBehaviour
     {
         [SerializeField]
@@ -38,6 +39,18 @@ namespace Towerino
             _baseScale = _visualObject.localScale;
         }
 
+        // Base update function, using virtual UpdateModifier function so it can be overridden in other
+        // projectile variations.
+        private void Update()
+        {
+            if (!_fired || _hitDetected || !gameObject.activeInHierarchy) return;
+
+            UpdateModifier(Time.deltaTime);
+        }
+
+        // Start up projectile, set it up in our parent tower anchor point
+        // eg: The ballista start in its position before getting fired for some seconds until
+        // tower fires it.
         public void TurnOn(TowerController parentTower)
         {
             _fired = false;
@@ -56,6 +69,8 @@ namespace Towerino
             if (_towerFx != null) _towerFx.ProjectileReady();
         }
 
+        // Turn off this projective object. Stopping autodestroy coroutine, canceling tweening effects and animating it
+        // to shrink then destroy (soon to be added pooling system handler)
         public virtual void TurnOff(bool instant = false)
         {
             StopCoroutine(AutoKill());
@@ -83,50 +98,51 @@ namespace Towerino
 
         public virtual void Fire(EnemyController targetedEnemy)
         {
+            // We set projectile flag as true and make transform to be facing its initial target's center
             _fired = true;
             transform.SetParent(GameMaster.Instance.Gameplay.ActivePoolingSystem.PoolingWrapper);
             transform.LookAt(targetedEnemy.BoundsCenter);
 
+            // If we have a trail effect we turn it on and begin emitting trail
             if (_trailFx != null)
             {
                 _trailFx.gameObject.SetActive(true);
                 _trailFx.emitting = true;
             }
 
+            // If we have projectile FX for a interface extra component in our parent tower, we
+            // trigger its function ProjectileFired. This give us specific effects between towers
             if (_towerFx != null) _towerFx.ProjectileFired();
 
+            // Not sure why im covering the validation if the gameobject is not active.
+            // It should be active at this point!
             if (gameObject.activeInHierarchy) StartCoroutine(AutoKill());
             else StopCoroutine(AutoKill());
-        }
-
-        private IEnumerator AutoKill()
-        {
-            if (!gameObject.activeInHierarchy || _hitDetected) StopCoroutine(AutoKill());
-
-            yield return new WaitForSeconds(_autoKillTimer);
-
-            TurnOff();
         }
 
         protected virtual void Hit(EnemyController enemyDirectHit = null)
         {
             if (!gameObject.activeInHierarchy) return;
 
+            // Creates new instance or reuse a pooled object of the impact fx gameobject (if any)
             if (_impactFx != null)
             {
-                //Instantiate(_impactFx, transform.position, Quaternion.identity).Play();
                 Transform impact = GameMaster.Instance.Gameplay.ActivePoolingSystem.GetObject(_impactFx.gameObject, GameMaster.Instance.Gameplay.ActivePoolingSystem.PoolingWrapper).transform;
                 impact.SetPositionAndRotation(transform.position, Quaternion.identity);
                 impact.gameObject.SetActive(true);
                 impact.GetComponent<ParticleSystem>().Play();
             }
 
+            // Release the trail effect attached to this object
             if (_trailFx != null) _trailFx.transform.SetParent(null);
 
+            // If we have a direct hit we apply damage entirely
             if (enemyDirectHit != null && _damageRadius == 0)
             {
                 enemyDirectHit.ApplyDamage(_impactDamage);
             }
+            // If we have splash damage (damage radius above 0) we check for impact distance between
+            // projectile and nearby enemies
             else if (_damageRadius > 0)
             {
                 Collider[] colliders = Physics.OverlapSphere(transform.position, _damageRadius);
@@ -138,10 +154,13 @@ namespace Towerino
                     {
                         splashDamageEnemy = colliders[i].gameObject.GetComponent<EnemyController>();
 
+                        // If we have a direct hit enemy, we apply damage entirely to this enemy
                         if (enemyDirectHit != null && enemyDirectHit == splashDamageEnemy)
                         {
                             enemyDirectHit.ApplyDamage(_impactDamage);
                         }
+                        // If the enemy is nearby we apply a proportional damage depending in distance
+                        // from hit position.
                         else
                         {
                             splashDamageEnemy.ApplyDamage(GetDamage(Vector3.Distance(transform.position, splashDamageEnemy.BoundsCenter)));
@@ -156,23 +175,30 @@ namespace Towerino
             TurnOff();
         }
 
+        // Base linear projectile position modifier
         protected virtual void UpdateModifier(float timeDelta)
         {
             transform.Translate(Vector3.forward * _speed * timeDelta);
         }
 
-        private void Update()
-        {
-            if (!_fired || _hitDetected || !gameObject.activeInHierarchy) return;
-
-            UpdateModifier(Time.deltaTime);
-        }
-
+        // Get splash damage depending in distance from targeted and hit point
         private float GetDamage(float hitDistance)
         {
             return (1 - Mathf.Clamp(hitDistance, 0, _damageRadius) / _damageRadius) * _impactDamage;
         }
 
+        // If the projectile didnt hit anything, we auto kill it after X time.
+        private IEnumerator AutoKill()
+        {
+            if (!gameObject.activeInHierarchy || _hitDetected) StopCoroutine(AutoKill());
+
+            yield return new WaitForSeconds(_autoKillTimer);
+
+            TurnOff();
+        }
+
+        // Checks for collision with something that is not a tower (ground or enemies)
+        // Calls Hit with a direct hit enemy or a null value if hit the ground.
         private void OnTriggerEnter(Collider other)
         {
             if (_hitDetected || other.gameObject.tag.Equals("Tower")) return;

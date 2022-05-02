@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Towerino
 {
+    // Simple lighting variables to use in each different lvl
     [CreateAssetMenu(fileName = "NewScenarioConfig", menuName = "Towerino/ScenarioConfig")]
     public class ScenarioConfigSO : ScriptableObject
     {

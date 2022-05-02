@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace Towerino
 {
+    // Tower base are the small available spots in the map for the player to build towers
+    // This controller is the one in charge of keeping a collider for the player to click on.
     public class TowerBaseController : MonoBehaviour
     {
         public bool HasTower { get { return _currentTower != null; } }
@@ -37,6 +39,8 @@ namespace Towerino
             ModifySelectedFx(false);
         }
 
+        // When the player BUYS a tower we call this function, increasing the collider size to
+        // it matches the tower size and (very important) TurnOn the new tower!
         public void SetTower(TowerController tower)
         {
             _collider.center = _center + Vector3.up * (_colliderSizeIncreased / 2);
@@ -46,6 +50,7 @@ namespace Towerino
             Deselect();
         }
 
+        // Player SOLD tower, we TurnOff tower, returning it to the PoolingSystem, and then release itself.
         public void UnsetTower()
         {
             _collider.center = _center;
@@ -56,6 +61,8 @@ namespace Towerino
             Deselect();
         }
 
+        // Returns a vector where this transform is with a vertical increase of two metters
+        // (will be used in Reward money HUD elements)
         public Vector3 GetHUDPosition()
         {
             if (_currentTower)
@@ -65,6 +72,7 @@ namespace Towerino
             else return transform.position;
         }
 
+        // FX cylinder to show visual indicator when tower base is selected.
         private void ModifySelectedFx(bool isSelected)
         {
             if (isSelected)

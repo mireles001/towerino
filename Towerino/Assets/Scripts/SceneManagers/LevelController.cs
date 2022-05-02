@@ -5,6 +5,8 @@ using UnityEngine;
 
 namespace Towerino
 {
+    // Current level controller. In charge of spawning enemies, managing player health and letting UI to show
+    // some visual stuff between Waves
     public class LevelController : MonoBehaviour
     {
         [System.Serializable]
@@ -22,16 +24,19 @@ namespace Towerino
             public NavigationArea navMeshArea;
         }
 
+        // Each level have a different start up money amount (to balance difficulty)
         [SerializeField]
         private int _levelStartMoney = 100;
         [SerializeField]
         private Transform _destination;
+        // Total waves per LEVEL, I used 3 for this version. Each wave have an array of Enemy data structs
         [SerializeField]
         private Wave[] _enemyWaves = new Wave[0];
         [SerializeField, Space]
         private MeshRenderer[] _navPathRenderers = new MeshRenderer[0];
         [SerializeField]
         private ScenarioConfigSO _lightConfiguration = null;
+        // I have a light object to be able to work! If not it looks pitch black when im not playing
         [SerializeField, Space]
         private GameObject _devLight = null;
 
@@ -40,6 +45,7 @@ namespace Towerino
         private float _headStartTimer, _waveTimer, _nextToSpawnTimer;
         private List<Enemy> _currentEnemyWave;
 
+        // You better be inside Game scene as an additive scene cuz if not, this wont do anything.
         private void Start()
         {
             _devLight.SetActive(false);
@@ -52,6 +58,7 @@ namespace Towerino
             {
                 if (_lightConfiguration != null) GameMaster.Instance.Gameplay.ApplyLightConfig(_lightConfiguration);
 
+                _health = 3;
                 GameMaster.Instance.Gameplay.SetCurrentLevel(this);
                 GameMaster.Instance.Gameplay.SetPlayerMoney(_levelStartMoney);
                 GameMaster.Instance.Gameplay.UI.UpdateLevelText($"{GameMaster.Instance.CurrentLevel}-1");
@@ -59,10 +66,14 @@ namespace Towerino
             }
         }
 
+        // Lots of things happening here...
         private void Update()
         {
+            // If player is dead, we dont do anything.
             if (_health == 0) return;
 
+            // Checks if headstart (warm up before wave) is running to keep doing that countdown
+            // and updates UI elements. When done we set the wave as active
             if (_headStartTimerRunning)
             {
                 _headStartTimer -= Time.deltaTime;
@@ -76,13 +87,16 @@ namespace Towerino
                     _waveTimer = 0;
                 }
             }
+            // If the wave is active we jump here
             else if (_waveActive)
             {
-
                 _waveTimer += Time.deltaTime;
 
+                // Check if the wave is cleared (no more enemies to spawn and no active enemies on screen
                 if (_waveCleared)
                 {
+                    // We do not go instantly to the next wave, we need the player to "process" he/she won!
+                    // we wait a little before moving forward. This is were we taste victory.
                     if (_waveTimer >= GameMaster.Instance.Gameplay.WaveEndWaitDuration)
                     {
                         StartNextWave();
@@ -92,6 +106,8 @@ namespace Towerino
                 {
                     if (_currentEnemyWave.Count != 0 && _nextToSpawnTimer <= _waveTimer)
                     {
+                        // (Always afraid of do/whiles) Check next enemy to spawn timer 
+                        // We spawn all of them that passes our time check vs time spawner validation
                         do
                         {
                             SpawnEnemy(_currentEnemyWave[0]);
@@ -101,6 +117,8 @@ namespace Towerino
                         if (_currentEnemyWave.Count > 0) _nextToSpawnTimer = _currentEnemyWave[0].spawnTimer;
                     }
 
+                    // If no more enemies to spawn, no active enemies on screen and wave is not yet cleared
+                    // We set it as cleared!
                     if (_currentEnemyWave.Count == 0 && _activeEnemyCounter == 0 && !_waveCleared)
                     {
                         _waveCleared = true;
@@ -108,18 +126,6 @@ namespace Towerino
                     }
                 }
             }
-        }
-
-        public void EnemyReachedDestination(EnemyController enemy)
-        {
-            _health--;
-
-            GameMaster.Instance.Gameplay.UI.UpdateHealthMeter(_health);
-            enemy.DisposeReached();
-            RemoveEnemy();
-
-            if (_health == 0)
-                GameMaster.Instance.Gameplay.GameOver();
         }
 
         private void StartNextWave()
@@ -131,13 +137,14 @@ namespace Towerino
                 GameMaster.Instance.Gameplay.ReleaseTowerSelection();
             }
 
+            // If we are out of waves, we move forward to the next level
             if (_currentWaveIndex == _enemyWaves.Length)
             {
                 GameMaster.Instance.Gameplay.LevelCleared();
             }
+            // Else, we prepare everything for out next wave (increase wave index and update UI properly)
             else
             {
-                _health = 3;
                 _activeEnemyCounter = 0;
                 StartHeadStartCountDown();
                 _nextToSpawnTimer = ArraySorter();
@@ -153,6 +160,7 @@ namespace Towerino
             }
         }
 
+        // First step in each wave. A warm up head start time for the player to make advantage moves.
         private void StartHeadStartCountDown()
         {
             _headStartTimerRunning = true;
@@ -160,6 +168,7 @@ namespace Towerino
             GameMaster.Instance.Gameplay.UI.ShowHeadStartTimer();
         }
 
+        // Spawners checks for available inactive enemy in our PoolingSystem and put it back to action!
         private void SpawnEnemy(Enemy enemyData)
         {
             EnemyController enemy = GameMaster.Instance.Gameplay.ActivePoolingSystem.GetObject(enemyData.gameObjectPrefab).GetComponent<EnemyController>();
@@ -171,6 +180,19 @@ namespace Towerino
 
         public void RemoveEnemy() { _activeEnemyCounter--; }
 
+        // If enemy reaches destination we decrease health and update what we need to update
+        public void EnemyReachedDestination(EnemyController enemy)
+        {
+            _health--;
+
+            GameMaster.Instance.Gameplay.UI.UpdateHealthMeter(_health);
+            enemy.DisposeReached();
+            RemoveEnemy();
+
+            if (_health == 0) GameMaster.Instance.Gameplay.GameOver();
+        }
+
+        // We sort current enemy waves by spawning time to make things easier for us.
         private float ArraySorter()
         {
             Enemy[] enemyWaveArray = _enemyWaves[_currentWaveIndex].enemyQueue;

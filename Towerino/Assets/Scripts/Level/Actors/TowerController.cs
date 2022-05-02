@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace Towerino
 {
+    // This component holds important values such as fire rate, fire range, projectile handling and animations of
+    // upper part of tower.
     public class TowerController : MonoBehaviour
     {
         public TowerType TowerType { get { return _towerType; } }
@@ -32,6 +34,7 @@ namespace Towerino
         private EnemyController _currentTarget;
         private TowerBaseController _currentTowerBase;
 
+        // Gets tower ready for action, assigning TowerBase it belongs and doing some badass animation when purchased.
         public void TurnOn(TowerBaseController towerBase)
         {
             _intervalTimer = _attackInterval;
@@ -47,6 +50,7 @@ namespace Towerino
             });
         }
 
+        // Stop fireprojectile coroutine, set all boolean flags to false and set inactive after some shrinking animation.
         public void TurnOff(bool instant = false)
         {
             StopCoroutine(FireProjectile());
@@ -79,6 +83,7 @@ namespace Towerino
 
             _intervalTimer -= Time.deltaTime;
 
+            // If no target is detected we just idle and spin around the upper part
             if (HasNoTarget())
             {
                 IdleMovement(Time.deltaTime);
@@ -86,8 +91,10 @@ namespace Towerino
             }
             else
             {
+                // For the upper part to face at valid target
                 LookAtTarget(Time.deltaTime);
 
+                // After waiting for interval, we FIRE!
                 if (_intervalTimer <= 0 && _currentProjectile != null)
                 {
                     _intervalTimer = _attackInterval;
@@ -96,6 +103,7 @@ namespace Towerino
             }
         }
 
+        // Triggered when the projectile is ready. Live ammunition detected!
         private void ReadyProjectile()
         {
             if (_currentProjectile != null) _currentProjectile.TurnOff(true);
@@ -106,6 +114,7 @@ namespace Towerino
             _currentProjectile.TurnOn(this);
         }
 
+        // Upon firing we wait half the attack interval as a visual cooldown (is this a good idea?)
         private IEnumerator FireProjectile()
         {
             _currentProjectile.Fire(_currentTarget);
@@ -116,6 +125,7 @@ namespace Towerino
             ReadyProjectile();
         }
 
+        // Idle movement handler, just some time delta dependant lerp
         private void IdleMovement(float timeDelta)
         {
             float rotationSpeed = _idleSpeed * timeDelta;
@@ -128,6 +138,7 @@ namespace Towerino
             }
         }
 
+        // We lerp both horizontal and vertical transform towards the targeted enemy. Again, based in time delta values.
         private void LookAtTarget(float timeDelta)
         {
             float rotationSpeed = _aimSpeed * timeDelta;
@@ -144,6 +155,7 @@ namespace Towerino
             }
         }
 
+        // Looks for a valid target by sphere casting and retrieving the closest enemy in range.
         private void LookForTarget()
         {
             RaycastHit[] hits = Physics.SphereCastAll(transform.position, _attackRange, transform.forward, 0);
@@ -172,6 +184,8 @@ namespace Towerino
             }
         }
 
+        // Boolean function that checks if its alive, if enemy already reached destination, and if its in attack distance
+        // to be a valida target.
         private bool HasNoTarget()
         {
             return _currentTarget == null || !_currentTarget.IsAlive || _currentTarget.ReachedDestination || Vector3.Distance(transform.position, _currentTarget.transform.position) > _attackRange;

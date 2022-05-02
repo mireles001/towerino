@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+// Generic functions, enums and other misc utileries used in the game
+// GameUtils are static to avoid worring about instancing classes or keeping scope of things.
 namespace Towerino
 {
     public static class GameUtils

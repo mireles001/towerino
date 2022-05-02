@@ -4,6 +4,9 @@ using UnityEngine.EventSystems;
 
 namespace Towerino
 {
+    // Controller for the main Gameplay scene. This bad boy is in charge of requesting
+    // additive scene loads. This is the main manager of the game, controlling UI, current level scopes
+    // and determining if user is buying, selling, gaining money, losing or moving to next level.
     public class GameController : MonoBehaviour
     {
         public float HeadStartDuration { get { return _headStartDuration; } }
@@ -21,6 +24,9 @@ namespace Towerino
         private float _waveEndWaitDuration = 3;
         [SerializeField, Tooltip("Attack hit shuffled sounds")]
         private AudioClip[] _hits = new AudioClip[0];
+
+        // IMPORTANT: These are the tower data structs, where we store what prefabs, human name and buy/sell prices
+        // for each tower type
         [SerializeField, Space, Header("Tower Prefabs")]
         private TowerData _towerBallista;
         [SerializeField]
@@ -61,6 +67,9 @@ namespace Towerino
                 else UI.ToggleQuit();
             }
 
+            // Upon click down we ray cast and see if we hit a TowerBase (small box colliders in the map)
+            // and openn the Buy/Sell panel. We do some validations if player clicks a new tower base
+            // or just clicking the same towerbase without any purpose.
             if (Input.GetMouseButtonDown(0))
             {
                 Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
@@ -83,6 +92,7 @@ namespace Towerino
                             UI.OpenBuySell(CurrentTowerSelection);
                         }
                     }
+                    // Raycasting no TowerBase? We close everything!
                     else if (CurrentTowerSelection != null)
                     {
                         CurrentTowerSelection.Deselect();
@@ -99,23 +109,17 @@ namespace Towerino
             CurrentTowerSelection = null;
         }
 
-        public void SetPlayerMoney(int startUpMoney)
-        {
-            _playerMoney = startUpMoney;
-            UI.UpdateMoney(_playerMoney);
-        }
-
         public void GotoMenu()
         {
             GameUtils.SetVolume(_music, 0, GameMaster.Instance.Fader.FadeInOutDuration.y);
             GameMaster.Instance.LoadScene(0);
         }
 
-        public void SetCurrentLevel(LevelController level)
-        {
-            _currentLevel = level;
-        }
+        // Additive loaded scene use this function to mark itself as the current level class
+        public void SetCurrentLevel(LevelController level) { _currentLevel = level; }
 
+        // Nullable return function that returns tower data struct info.
+        // Used by Buy/Sell mechanics
         public TowerData? GetTowerData(TowerType towerType)
         {
             TowerData? data;
@@ -138,6 +142,9 @@ namespace Towerino
             return data;
         }
 
+        // If user wins we call GameMaster to increase current level index, and then
+        // Loads new level or if we detect that is bigger than 3 (total levels inn game)
+        // we send player to credits scene.
         public void LevelCleared()
         {
             bool gameCleared = GameMaster.Instance.CurrentLevel >= 3;
@@ -148,12 +155,14 @@ namespace Towerino
                 GameUtils.SetVolume(_music, 0, GameMaster.Instance.Fader.FadeInOutDuration.y);
                 GameMaster.Instance.LoadScene(2);
             }
-            else
-            {
-                LoadCurrentLevel();
-            }
+            else LoadCurrentLevel();
         }
 
+        // If user dies we just reset the same level
+        public void GameOver() { LoadCurrentLevel(); }
+
+        // This function only request for an additive load scene, and does some animation to the camera
+        // this is only for the looks. Ah! we also close UI in case user had Buy/Sell panel opened.
         public void LoadCurrentLevel()
         {
             if (SceneManager.sceneCount > 1)
@@ -167,9 +176,12 @@ namespace Towerino
             GameMaster.Instance.LoadCurrentLevel(this);
         }
 
+        // Used as a callback when additive level scene load is complete.
+        // Flush pool is we have something there and we call FadeOut (now that the new level is loaded).
         public void LoadLevelCompleted()
         {
             ActivePoolingSystem.FlushData();
+            UI.HideHealthMeter();
 
             LeanTween.move(_cameraWrapper, _cameraWrapperBasePosition, GameMaster.Instance.Fader.FadeInOutDuration.y).setEase(LeanTweenType.easeOutQuad);
             GameMaster.Instance.Fader.FadeOut();
@@ -184,17 +196,33 @@ namespace Towerino
             else _music.Play();
         }
 
+        // PlayOneShot audio to use the same audiosource
         public void PlayHitSFX()
         {
             if (_hits.Length > 0) _music.PlayOneShot(_hits[Random.Range(0, _hits.Length - 1)]);
+        }
+
+
+        // Modify player money and request UI update
+        private void ModifyPlayerMoney(int addMoney)
+        {
+            _playerMoney += addMoney;
+            UI.UpdateMoney(_playerMoney);
+        }
+        
+        // Overrides money (used only at start of level) and the updates UI
+        public void SetPlayerMoney(int startUpMoney)
+        {
+            _playerMoney = startUpMoney;
+            ModifyPlayerMoney(0);
         }
 
         public void BuyTower(TowerType towerType)
         {
             TowerData data = (TowerData)GetTowerData(towerType);
             if (CurrentTowerSelection.HasTower || _playerMoney < data.BuyPrice) return;
-            _playerMoney -= data.BuyPrice;
-            UI.UpdateMoney(_playerMoney);
+            ModifyPlayerMoney(-data.BuyPrice);
+            // Creates or pulls an inactive object from PoolingSystem
             CurrentTowerSelection.SetTower(ActivePoolingSystem.GetObject(data.Prefab).GetComponent<TowerController>());
             UI.CloseBuySell();
         }
@@ -204,31 +232,30 @@ namespace Towerino
             if (!CurrentTowerSelection.HasTower) return;
 
             TowerData data = (TowerData)GetTowerData(CurrentTowerSelection.TowerType);
-            _playerMoney += data.SellPrice;
-            UI.UpdateMoney(_playerMoney);
+            ModifyPlayerMoney(data.SellPrice);
             UI.RewardMoney(data.SellPrice, CurrentTowerSelection.GetHUDPosition());
+            // Prepares to set inactive and return object to PoolingSystem
             CurrentTowerSelection.UnsetTower();
             UI.CloseBuySell();
         }
 
+        // When player kills enemies we reward with money! (amount of money defined in enemy prefab)
+        // Reward money intends to create a HUD element temporaly floating on top of destroyed enemy
+        // showing earnt money.
         public void EnemyReward(int reward, Vector3 enemyPosition)
         {
-            _playerMoney += reward;
-            UI.UpdateMoney(_playerMoney);
+            ModifyPlayerMoney(reward);
             UI.RewardMoney(reward, enemyPosition);
         }
 
-        public void GameOver()
-        {
-            LoadCurrentLevel();
-        }
-
+        // When exiting this scene we flush our pooling manager
         private void OnDestroy()
         {
             ActivePoolingSystem.FlushData();
             GameMaster.Instance.RemoveGamePlay();
         }
 
+        // TODO: Apply scene lighting override
         public void ApplyLightConfig(ScenarioConfigSO config)
         {
 

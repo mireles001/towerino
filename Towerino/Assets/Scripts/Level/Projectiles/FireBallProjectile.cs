@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Towerino
 {
+    // Inheritance class to create special projectile behavior for parabollic attacks with post-hit effects
     public class FireBallProjectile : BaseProjectile
     {
         [SerializeField]
@@ -22,6 +23,7 @@ namespace Towerino
             base.Awake();
         }
 
+        // Fire function setup physical rigidbody and then sets velocity 
         public override void Fire(EnemyController targetedEnemy)
         {
             base.Fire(targetedEnemy);

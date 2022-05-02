@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace Towerino
 {
+    // Credits scene controller... Just starts and rotate a prop and that it.
     public class CreditsController : MonoBehaviour
     {
         [SerializeField]

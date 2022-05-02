@@ -4,6 +4,7 @@ using TMPro;
 
 namespace Towerino
 {
+    // User interface handler, it doesn't have Update. It is only a call to action funtions holder.
     public class GameUIController : MonoBehaviour
     {
         public bool IsBuySellModalOpen { get; private set; }
@@ -70,6 +71,8 @@ namespace Towerino
         private bool _quitToggle, _quitToggleTweening;
         private GameController _main;
 
+        // Only used when Game scene is loaded. Hides, sets in 0 or inactive everything that 
+        // needs to be hidden at the beginning.
         private void Start()
         {
             _quitPanel.transform.localScale = Vector3.zero;
@@ -82,9 +85,9 @@ namespace Towerino
             _timerPanel.alpha = 0;
             _announcer.alpha = 0;
 
-            _buyBallista.onClick.AddListener(delegate { BuyButtonHandler(TowerType.ballistaTower); });
-            _buyCannon.onClick.AddListener(delegate { BuyButtonHandler(TowerType.cannonTower); });
-            _buyFirebomb.onClick.AddListener(delegate { BuyButtonHandler(TowerType.fireBombTower); });
+            _buyBallista.onClick.AddListener(delegate { _main.BuyTower((TowerType.ballistaTower)); });
+            _buyCannon.onClick.AddListener(delegate { _main.BuyTower((TowerType.cannonTower)); });
+            _buyFirebomb.onClick.AddListener(delegate { _main.BuyTower((TowerType.fireBombTower)); });
         }
 
         public GameUIController StartUp(GameController main)
@@ -184,8 +187,11 @@ namespace Towerino
 
         public void ShowHealthMeter()
         {
+            _healthPanel.alpha = 0;
             LeanTween.value(_healthPanel.gameObject, 0, 1, 1).setOnUpdate((float val) => { _healthPanel.alpha = val; });
         }
+
+        public void HideHealthMeter() { _healthPanel.alpha = 0; }
 
         public void UpdateHealthMeter(int currentHelth)
         {
@@ -225,11 +231,6 @@ namespace Towerino
         public void RewardMoney(int money, Vector3 position)
         {
             Debug.Log("Add floating +$$$ on top of focused item");
-        }
-
-        private void BuyButtonHandler(TowerType towerType)
-        {
-            _main.BuyTower(towerType);
         }
     }
 }

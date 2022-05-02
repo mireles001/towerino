@@ -32,6 +32,7 @@ namespace Towerino
         private Material[] _sharedMaterials;
         private Collider _collider;
 
+        // Bunch of public getters for the commodity of other components 
         public float EnemySpeed
         {
             get { return _speed; }
@@ -51,14 +52,19 @@ namespace Towerino
             get { return _collider.bounds.center; }
         }
 
+        // When we awake (only once, not even if object is returned to pooling system) we check
+        // materials exposed variables so we can create shader effects in execution.
         private void Awake()
         {
             _agent.speed = _speed;
             _maxHp = _hp;
             _collider = GetComponent<Collider>();
+            // We look and store property ID for quicker usage up next
             _cutoffHeight = Shader.PropertyToID("Vector1_b59e3bdf317448bd9a65115a1cea1cb1");
             _baseColor = Shader.PropertyToID("Color_36667b28f67e4ffe93dd0988b3e41eea");
 
+            // check for shared materials, we create a unique instance of it and assign it to this
+            // specific enemy for individual effects (death and damage)
             Material[] originalMaterials = _renderer.sharedMaterials;
             _sharedMaterials = new Material[originalMaterials.Length];
             _materialColors = new Color[originalMaterials.Length];
@@ -73,8 +79,10 @@ namespace Towerino
             _renderer.sharedMaterials = _sharedMaterials;
         }
 
+        // Starting up enemies involves mainly in reseting NavMesh component
         public void TurnOn(Vector3 destination, NavigationArea navMeshArea)
         {
+            // We set active first (or else navmesh fails)
             gameObject.SetActive(true);
 
             for (int i = 0; i < _sharedMaterials.Length; i++)
@@ -87,6 +95,9 @@ namespace Towerino
             ReachedDestination = false;
             _collider.enabled = true;
             _visualAsset.localScale = Vector3.zero;
+
+            // We clear the NavMeshArea to nothing and the assign the areas that our
+            // new spawned enemy has assigned in its data struct
             _agent.areaMask = 1 << NavMesh.GetAreaFromName("Nothing");
 
             if (navMeshArea == NavigationArea.pathA || navMeshArea == NavigationArea.both)
@@ -99,14 +110,17 @@ namespace Towerino
                 _agent.areaMask += 1 << NavMesh.GetAreaFromName("PathB");
             }
 
+            // Enable all our nav agent variables and component
             _agent.enabled = true;
             _agent.isStopped = false;
             _agent.enabled = true;
+            // Lets not forget to let it know its destination!
             _agent.destination = destination;
 
             LeanTween.scale(_visualAsset.gameObject, Vector3.one, 0.25f).setEase(LeanTweenType.easeOutQuad);
         }
 
+        // Set inactive and send it back to pooling system
         private void TurnOff(bool instant = false)
         {
             if (_agent.enabled) _agent.isStopped = true;
@@ -115,27 +129,32 @@ namespace Towerino
             GameMaster.Instance.Gameplay.ActivePoolingSystem.ReturnObject(gameObject);
         }
 
+        // Setting exposed boolean if enemy already reached destination (used by towers to know if its a valid target.
+        // we do not want wasted bullets in already gone enemies, dont we?)
         public EnemyController SetReachedDestination(bool val)
         {
             ReachedDestination = val;
-
             return this;
         }
 
+        // Apply damage to enemy
         public EnemyController ApplyDamage(float dmg)
         {
             if (!ReachedDestination)
             {
                 _hp -= dmg;
 
+                // hit sound request, plays random sound in hit clips array
                 GameMaster.Instance.Gameplay.PlayHitSFX();
 
+                // If hp reaches 0, we dispose of enemy
                 if (_hp <= 0)
                 {
                     _hp = 0;
 
                     DisposeDeath();
                 }
+                // If enemy is not dead, we animate the color value just for visual fx eye candy
                 else
                 {
                     LeanTween.value(gameObject, 0, 1, 0.33f).setOnUpdate((float val) => 
@@ -153,6 +172,7 @@ namespace Towerino
             return this;
         }
 
+        // When the enemy reached its destination we shrink it and the call TurnOff to do the rest
         public void DisposeReached()
         {
             LeanTween.scale(_visualAsset.gameObject, Vector3.one * 1.25f, _reachedDuration * 0.33f).setEase(LeanTweenType.easeOutQuad).setOnComplete(() => {
@@ -160,14 +180,18 @@ namespace Towerino
             });
         }
 
+        // If player killed this enemy we turn off collider and stop agent movement
         private void DisposeDeath()
         {
             _agent.isStopped = true;
             _agent.enabled = _collider.enabled = false;
 
+            // Remove this enemy from active enemy counter in LevelComponent
             GameMaster.Instance.Gameplay.CurrentLevel.RemoveEnemy();
+            // Add reward money to player for killing this enemy
             GameMaster.Instance.Gameplay.EnemyReward(_rewardPerKill, transform.position + Vector3.up * 2);
 
+            // Fancy effect for disolving enemies, then let TurnOff do the rest.
             LeanTween.value(gameObject, 0f, -1f, _deathDuration).setOnUpdate((float val) =>
             {
                 for (int i = 0; i < _sharedMaterials.Length; i++)
