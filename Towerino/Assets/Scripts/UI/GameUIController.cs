@@ -45,11 +45,27 @@ namespace Towerino
         private TMP_Text _sellTowerName = null;
 
         [SerializeField, Space, Header("Life and Timer")]
-        private CanvasGroup _health = null;
+        private CanvasGroup _healthPanel = null;
+        [SerializeField]
+        private GameObject[] _healthHearts = new GameObject[0];
+        [SerializeField]
+        private CanvasGroup _timerPanel = null;
+        [SerializeField]
+        private Image _timerBar = null;
+        [SerializeField]
+        private Color _startColor = Color.cyan;
+        [SerializeField]
+        private Color _endColor = Color.cyan;
         [SerializeField]
         private TMP_Text _levelWaveText = null;
         [SerializeField]
         private TMP_Text _moneyText = null;
+        [SerializeField]
+        private CanvasGroup _announcer = null;
+        [SerializeField]
+        private TMP_Text _announcerLevel = null;
+        [SerializeField]
+        private TMP_Text _announcerWave = null;
 
         private bool _quitToggle, _quitToggleTweening;
         private GameController _main;
@@ -61,6 +77,10 @@ namespace Towerino
 
             _buySellPanel.transform.localScale = Vector3.zero;
             _buySellPanel.SetActive(false);
+
+            _healthPanel.alpha = 0;
+            _timerPanel.alpha = 0;
+            _announcer.alpha = 0;
 
             _buyBallista.onClick.AddListener(delegate { BuyButtonHandler(TowerType.ballistaTower); });
             _buyCannon.onClick.AddListener(delegate { BuyButtonHandler(TowerType.cannonTower); });
@@ -135,7 +155,6 @@ namespace Towerino
                 });
             }
             
-
             IsBuySellModalOpen = true;
         }
 
@@ -146,54 +165,71 @@ namespace Towerino
             LeanTween.scale(_buySellPanel, Vector3.zero, _panelTweenDuration).setEase(LeanTweenType.easeInQuad).setOnComplete(() => { _buySellPanel.SetActive(false); });
         }
 
-        private void BuyButtonHandler(TowerType towerType)
-        {
-            _main.BuyTower(towerType);
-        }
-
         public void ShowHeadStartTimer()
         {
-
+            _timerBar.rectTransform.localScale = Vector3.one;
+            LeanTween.value(_timerPanel.gameObject, 0, 1, 0.33f).setOnUpdate((float val) => { _timerPanel.alpha = val; });
         }
 
         public void HideHeadStartTimer()
         {
-
+            LeanTween.value(_timerPanel.gameObject, 1, 0, 0.33f).setOnUpdate((float val) => { _timerPanel.alpha = val; });
         }
 
         public void UpdateHeadStartTimer(float progress)
         {
-
+            _timerBar.rectTransform.localScale = new Vector3(Mathf.Lerp(1, 0, progress), 1, 1);
+            _timerBar.color = Color.Lerp(_startColor, _endColor, progress);
         }
 
         public void ShowHealthMeter()
         {
-
-        }
-
-        public void HideHealthMeter()
-        {
-
+            LeanTween.value(_healthPanel.gameObject, 0, 1, 1).setOnUpdate((float val) => { _healthPanel.alpha = val; });
         }
 
         public void UpdateHealthMeter(int currentHelth)
         {
-
+            for (int i = 0; i < _healthHearts.Length; i++)
+            {
+                _healthHearts[i].SetActive(i < currentHelth);
+            }
         }
 
-        public void UpdateMoney(int val)
+        public void UpdateMoney(int val) { _moneyText.text = $"${val}"; }
+
+        public void UpdateLevelText(string val) { _levelWaveText.text = val; }
+
+        public void ShowAnnouncer(int level, int wave)
         {
-            _moneyText.text = $"${val}";
+            _announcerLevel.text = $"Level {level}";
+            _announcerWave.text = $"Wave {wave}";
+
+            _announcer.alpha = 0;
+            _announcer.gameObject.SetActive(true);
+            LeanTween.value(_announcer.gameObject, 0, 1, 0.4f).setOnUpdate((float val) =>
+            {
+                _announcer.alpha = val;
+            }).setOnComplete(() =>
+            {
+                LeanTween.value(_announcer.gameObject, 1, 0, 0.6f).setOnUpdate((float val) =>
+                {
+                    _announcer.alpha = val;
+                }).setOnComplete(() =>
+                {
+                    _announcer.gameObject.SetActive(false);
+                }).setDelay(1);
+            });
         }
 
-        public void UpdateLevelText(string val)
-        {
-            _levelWaveText.text = val;
-        }
-
+        // TODO: Creating floating +$$$ UI
         public void RewardMoney(int money, Vector3 position)
         {
+            Debug.Log("Add floating +$$$ on top of focused item");
+        }
 
+        private void BuyButtonHandler(TowerType towerType)
+        {
+            _main.BuyTower(towerType);
         }
     }
 }

@@ -82,9 +82,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb4434ab956df1c429bf5fda26ccbdea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _rewardPerKill: 100
-  _hp: 30
-  _speed: 4
+  _rewardPerKill: 60
+  _hp: 42
+  _speed: 4.4
   _reachedDuration: 0.35
   _deathDuration: 1.25
   _visualAsset: {fileID: 1201265706066327906}

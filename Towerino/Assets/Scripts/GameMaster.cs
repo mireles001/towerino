@@ -16,7 +16,7 @@ namespace Towerino
         private static GameMaster _instance;
 
         public bool GameInitialized { get; private set; }
-        public int CurrentLevel { get; private set; } = 3;
+        public int CurrentLevel { get; private set; } = 1;
         public GameController Gameplay { get; private set; }
         public FaderController Fader
         {

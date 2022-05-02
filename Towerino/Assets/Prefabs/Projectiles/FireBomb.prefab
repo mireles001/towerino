@@ -9686,9 +9686,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _type: 2
-  _impactDamage: 10
+  _impactDamage: 14
   _damageRadius: 10
   _speed: 0
+  _turnOffProjectileDuration: 0.15
   _autoKillTimer: 5
   _visualObject: {fileID: 224383016893385758}
   _trailFx: {fileID: 0}

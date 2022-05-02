@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,7 +24,7 @@ namespace Towerino
             {
                 go = _data[label][1][0]; // PICKS FIRST FROM INACTIVE POOL
                 _data[label][1].RemoveAt(0);
-                if (label.Equals("pool_Ballista") || label.Equals("pool_Squire")) Debug.Log($"Reusing [{label}]: {go.GetInstanceID()}");
+                if (label.Equals("pool_Ballista")) Debug.Log($"Reusing [{label}]: {go.GetInstanceID()}");
             }
             else if (!_data.ContainsKey(label))
             {
@@ -42,7 +40,7 @@ namespace Towerino
                 go = Instantiate(prefab, parent);
                 go.name = prefab.name;
                 go.SetActive(false);
-                if (label.Equals("pool_Ballista") || label.Equals("pool_Squire")) Debug.Log($"Create/Add [{label}]: {go.GetInstanceID()}");
+                if (label.Equals("pool_Ballista")) Debug.Log($"Create/Add [{label}]: {go.GetInstanceID()}");
             }
 
             _data[label][0].Add(go);
@@ -59,7 +57,7 @@ namespace Towerino
                 int index = _data[label][0].FindIndex(x => x.Equals(go));
                 _data[label][0].RemoveAt(index);
                 _data[label][1].Add(go);
-                if (label.Equals("pool_Ballista") || label.Equals("pool_Squire")) Debug.Log($"Returning [{label}]: {go.GetInstanceID()}");
+                if (label.Equals("pool_Ballista")) Debug.Log($"Returning [{label}]: {go.GetInstanceID()}");
             }
         }
 
@@ -87,6 +85,7 @@ namespace Towerino
             }
             _data = null;
             Resources.UnloadUnusedAssets();
+            _data = new Dictionary<string, List<GameObject>[]>();
         }
 
         private void DestroyGameObjects(KeyValuePair<string, List<GameObject>[]> poolCollection, int listIndex)

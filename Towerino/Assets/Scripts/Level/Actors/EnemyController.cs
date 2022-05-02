@@ -109,7 +109,7 @@ namespace Towerino
 
         private void TurnOff(bool instant = false)
         {
-            _agent.isStopped = true;
+            if (_agent.enabled) _agent.isStopped = true;
             _agent.enabled = _collider.enabled = false;
             gameObject.SetActive(false);
             GameMaster.Instance.Gameplay.ActivePoolingSystem.ReturnObject(gameObject);

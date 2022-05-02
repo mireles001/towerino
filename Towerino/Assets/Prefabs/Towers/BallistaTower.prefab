@@ -139,8 +139,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d88c3966d78a4842a38dc9aa1cbf7ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackRange: 6
-  _attackInterval: 1
+  _towerType: 0
+  _attackRange: 7
+  _attackInterval: 0.75
   _projectilePrefab: {fileID: 5799581735090252082, guid: 49a835aa8d2f29c43ba739d116ab4e86, type: 3}
   _projectileAnchor: {fileID: 325172410240644159}
   _yRotator: {fileID: 325172411640366714}

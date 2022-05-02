@@ -32,6 +32,8 @@ namespace Towerino
         private MeshRenderer[] _navPathRenderers = new MeshRenderer[0];
         [SerializeField]
         private ScenarioConfigSO _lightConfiguration = null;
+        [SerializeField, Space]
+        private GameObject _devLight = null;
 
         private int _currentWaveIndex, _health, _activeEnemyCounter;
         private bool _headStartTimerRunning, _waveActive, _waveCleared;
@@ -40,6 +42,7 @@ namespace Towerino
 
         private void Start()
         {
+            _devLight.SetActive(false);
             for (int i = 0; i < _navPathRenderers.Length; i++)
             {
                 _navPathRenderers[i].enabled = false;
@@ -52,7 +55,7 @@ namespace Towerino
                 GameMaster.Instance.Gameplay.SetCurrentLevel(this);
                 GameMaster.Instance.Gameplay.SetPlayerMoney(_levelStartMoney);
                 GameMaster.Instance.Gameplay.UI.UpdateLevelText($"{GameMaster.Instance.CurrentLevel}-1");
-                Invoke("StartNextWave", 2); // Lets give a breather to our players...
+                Invoke("StartNextWave", 0.75f); // Lets give a breather to our players...
             }
         }
 
@@ -63,11 +66,10 @@ namespace Towerino
             if (_headStartTimerRunning)
             {
                 _headStartTimer -= Time.deltaTime;
-                GameMaster.Instance.Gameplay.UI.UpdateHeadStartTimer(_headStartTimer / GameMaster.Instance.Gameplay.HeadStartDuration);
+                GameMaster.Instance.Gameplay.UI.UpdateHeadStartTimer(1 - _headStartTimer / GameMaster.Instance.Gameplay.HeadStartDuration);
                 if (_headStartTimer <= 0)
                 {
                     GameMaster.Instance.Gameplay.UI.HideHeadStartTimer();
-                    GameMaster.Instance.Gameplay.UI.ShowHealthMeter();
 
                     _headStartTimerRunning = false;
                     _waveActive = true;
@@ -83,7 +85,6 @@ namespace Towerino
                 {
                     if (_waveTimer >= GameMaster.Instance.Gameplay.WaveEndWaitDuration)
                     {
-                        // TODO: Send UI first
                         StartNextWave();
                     }
                 }
@@ -109,9 +110,26 @@ namespace Towerino
             }
         }
 
+        public void EnemyReachedDestination(EnemyController enemy)
+        {
+            _health--;
+
+            GameMaster.Instance.Gameplay.UI.UpdateHealthMeter(_health);
+            enemy.DisposeReached();
+            RemoveEnemy();
+
+            if (_health == 0)
+                GameMaster.Instance.Gameplay.GameOver();
+        }
+
         private void StartNextWave()
         {
             _waveActive = _waveCleared = false;
+
+            if (GameMaster.Instance.Gameplay.CurrentTowerSelection != null)
+            {
+                GameMaster.Instance.Gameplay.ReleaseTowerSelection();
+            }
 
             if (_currentWaveIndex == _enemyWaves.Length)
             {
@@ -125,6 +143,13 @@ namespace Towerino
                 _nextToSpawnTimer = ArraySorter();
                 _currentWaveIndex++;
                 GameMaster.Instance.Gameplay.UI.UpdateLevelText($"{GameMaster.Instance.CurrentLevel}-{_currentWaveIndex}");
+                GameMaster.Instance.Gameplay.UI.ShowAnnouncer(GameMaster.Instance.CurrentLevel, _currentWaveIndex);
+            }
+
+            if (_currentWaveIndex == 1)
+            {
+                GameMaster.Instance.Gameplay.UI.UpdateHealthMeter(_health);
+                GameMaster.Instance.Gameplay.UI.ShowHealthMeter();
             }
         }
 
@@ -132,21 +157,7 @@ namespace Towerino
         {
             _headStartTimerRunning = true;
             _headStartTimer = GameMaster.Instance.Gameplay.HeadStartDuration;
-
             GameMaster.Instance.Gameplay.UI.ShowHeadStartTimer();
-        }
-
-        public void EnemyReachedDestination(EnemyController enemy)
-        {
-            _health--;
-            GameMaster.Instance.Gameplay.UI.UpdateHealthMeter(_health);
-            enemy.DisposeReached();
-            RemoveEnemy();
-
-            if (_health == 0)
-            {
-                GameMaster.Instance.Gameplay.GameOver();
-            }
         }
 
         private void SpawnEnemy(Enemy enemyData)
@@ -157,6 +168,8 @@ namespace Towerino
 
             _activeEnemyCounter++;
         }
+
+        public void RemoveEnemy() { _activeEnemyCounter--; }
 
         private float ArraySorter()
         {
@@ -173,19 +186,15 @@ namespace Towerino
             return _currentEnemyWave[0].spawnTimer;
         }
 
-        public void RemoveEnemy()
-        {
-            _activeEnemyCounter--;
-        }
-
 #if UNITY_EDITOR
         private void OnGUI()
         {
             if (_waveActive)
             {
                 GUI.color = Color.black;
-                GUI.Label(new Rect(10, 40, 250, 30), $"Wave timer: {_waveTimer}");
+                GUI.Label(new Rect(10, 40, 250, 30), $"Wave timer: {_waveTimer.ToString("0.00")}");
                 GUI.Label(new Rect(10, 60, 250, 30), $"Active Enemies: {_activeEnemyCounter}");
+                GUI.Label(new Rect(10, 80, 250, 30), $"Health: {_health}");
             }
         }
 #endif

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 namespace Towerino
 {
@@ -55,9 +56,7 @@ namespace Towerino
             {
                 if (CurrentTowerSelection != null)
                 {
-                    CurrentTowerSelection.Deselect();
-                    UI.CloseBuySell();
-                    CurrentTowerSelection = null;
+                    ReleaseTowerSelection();
                 }
                 else UI.ToggleQuit();
             }
@@ -66,7 +65,7 @@ namespace Towerino
             {
                 Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
-                if (Physics.Raycast(ray, out hit))
+                if (Physics.Raycast(ray, out hit) && !EventSystem.current.IsPointerOverGameObject())
                 {
                     GameObject gameHit = hit.collider.gameObject;
                     if (gameHit.tag.Equals("Tower"))
@@ -74,7 +73,10 @@ namespace Towerino
                         TowerBaseController towerBase = gameHit.GetComponent<TowerBaseController>();
                         if (towerBase != null)
                         {
-                            if (CurrentTowerSelection != null && CurrentTowerSelection != towerBase) CurrentTowerSelection.Deselect();
+                            if (CurrentTowerSelection != null && CurrentTowerSelection != towerBase)
+                            {
+                                CurrentTowerSelection.Deselect();
+                            }
 
                             CurrentTowerSelection = towerBase;
                             CurrentTowerSelection.Select();
@@ -88,6 +90,13 @@ namespace Towerino
                     }
                 }
             }
+        }
+
+        public void ReleaseTowerSelection()
+        {
+            CurrentTowerSelection.Deselect();
+            UI.CloseBuySell();
+            CurrentTowerSelection = null;
         }
 
         public void SetPlayerMoney(int startUpMoney)
@@ -154,12 +163,13 @@ namespace Towerino
             }
             else _cameraWrapper.transform.position = _cameraWrapperMovePosition;
 
+            UI.CloseBuySell();
             GameMaster.Instance.LoadCurrentLevel(this);
         }
 
         public void LoadLevelCompleted()
         {
-            ActivePoolingSystem.TurnOffPooledObjects();
+            ActivePoolingSystem.FlushData();
 
             LeanTween.move(_cameraWrapper, _cameraWrapperBasePosition, GameMaster.Instance.Fader.FadeInOutDuration.y).setEase(LeanTweenType.easeOutQuad);
             GameMaster.Instance.Fader.FadeOut();
@@ -182,9 +192,7 @@ namespace Towerino
         public void BuyTower(TowerType towerType)
         {
             TowerData data = (TowerData)GetTowerData(towerType);
-
             if (CurrentTowerSelection.HasTower || _playerMoney < data.BuyPrice) return;
-
             _playerMoney -= data.BuyPrice;
             UI.UpdateMoney(_playerMoney);
             CurrentTowerSelection.SetTower(ActivePoolingSystem.GetObject(data.Prefab).GetComponent<TowerController>());
@@ -212,7 +220,7 @@ namespace Towerino
 
         public void GameOver()
         {
-            Debug.Log("You lose");
+            LoadCurrentLevel();
         }
 
         private void OnDestroy()

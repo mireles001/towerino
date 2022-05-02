@@ -10,8 +10,8 @@ namespace Towerino
         private ParticleSystem _fireTrail = null;
         [SerializeField]
         private ParticleSystem _smokeTrail = null;
-        [SerializeField]
-        private GameObject _fireGround = null;
+        //[SerializeField]
+        //private GameObject _fireGround = null;
 
         private Rigidbody _rigidBody;
 
@@ -58,14 +58,15 @@ namespace Towerino
 
         public override void TurnOff(bool instant = false)
         {
-            if (!instant) CreateFireGround();
+            // Catapult towers are supposed to create fire on ground for X seconds
+            //if (!instant) CreateFireGround();
             base.TurnOff(instant);
         }
 
-        private void CreateFireGround()
-        {
-            //Debug.Log("Fire ground");
-        }
+        //private void CreateFireGround()
+        //{
+        //    Debug.Log("Fire ground");
+        //}
 
         // As seen in aldonaletto's answer
         // https://answers.unity.com/questions/145972/how-to-make-enemy-canon-ball-fall-on-mooving-targe.html

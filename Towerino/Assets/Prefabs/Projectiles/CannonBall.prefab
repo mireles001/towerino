@@ -77,9 +77,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _type: 1
-  _impactDamage: 6
-  _damageRadius: 5
-  _speed: 18
+  _impactDamage: 6.6
+  _damageRadius: 4
+  _speed: 24
+  _turnOffProjectileDuration: 0.15
   _autoKillTimer: 5
   _visualObject: {fileID: 2025356136312662729}
   _trailFx: {fileID: 3032204596984718963}

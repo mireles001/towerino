@@ -244,7 +244,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _towerType: 1
   _attackRange: 7
-  _attackInterval: 2
+  _attackInterval: 1.25
   _projectilePrefab: {fileID: 1896169277080490010, guid: 9243367c00fd2234bb6dcb4ba9110f1c, type: 3}
   _projectileAnchor: {fileID: 2586646828282263308}
   _yRotator: {fileID: 2586646828466396120}
