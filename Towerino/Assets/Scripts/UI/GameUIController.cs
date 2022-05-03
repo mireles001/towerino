@@ -8,7 +8,10 @@ namespace Towerino
     public class GameUIController : MonoBehaviour
     {
         public bool IsBuySellModalOpen { get; private set; }
+        public Canvas MainCanvas { get { return _mainCanvas; } }
 
+        [SerializeField]
+        private Canvas _mainCanvas = null;
         [SerializeField]
         private float _panelTweenDuration = 0.25f;
 
@@ -67,6 +70,9 @@ namespace Towerino
         private TMP_Text _announcerLevel = null;
         [SerializeField]
         private TMP_Text _announcerWave = null;
+
+        [SerializeField, Space, Header("HUD Prefabs")]
+        private GameObject _enemyHpBar = null;
 
         private bool _quitToggle, _quitToggleTweening;
         private GameController _main;
@@ -231,6 +237,11 @@ namespace Towerino
         public void RewardMoney(int money, Vector3 position)
         {
             Debug.Log("Add floating +$$$ on top of focused item");
+        }
+
+        public void SetupEnemyHp(EnemyController enemy)
+        {
+            enemy.SetHpBar(GameMaster.Instance.Gameplay.ActivePoolingSystem.GetObject(_enemyHpBar, _mainCanvas.transform).GetComponent<EnemyHpController>().TurnOn(enemy));
         }
     }
 }

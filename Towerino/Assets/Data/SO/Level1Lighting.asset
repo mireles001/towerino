@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 70f51e6263c6aab4d96fae1ca2fbb3ef, type: 3}
   m_Name: Level1Lighting
   m_EditorClassIdentifier: 
-  lightRotation: {x: 0, y: 0, z: 0}
-  lightColor: {r: 0, g: 0, b: 0, a: 0}
-  skyColor: {r: 0, g: 0, b: 0, a: 0}
-  midColor: {r: 0, g: 0, b: 0, a: 0}
-  lowColor: {r: 0, g: 0, b: 0, a: 0}
+  lightRotation: {x: 75, y: -280, z: 0}
+  lightColor: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  shadowColor: {r: 0.41509432, g: 0.18209478, b: 0.013705952, a: 1}
+  skyColor: {r: 0.54089534, g: 0.7533988, b: 0.8018868, a: 1}
+  midColor: {r: 0.4245283, g: 0.38675532, b: 0.33441615, a: 1}
+  lowColor: {r: 0.7356246, g: 0.09838692, b: 0.024289507, a: 1}

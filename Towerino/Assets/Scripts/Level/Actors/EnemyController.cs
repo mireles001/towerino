@@ -29,6 +29,7 @@ namespace Towerino
         private int _cutoffHeight, _baseColor;
         private float _maxHp;
         private Color[] _materialColors;
+        private EnemyHpController _hpBar;
         private Material[] _sharedMaterials;
         private Collider _collider;
 
@@ -118,11 +119,14 @@ namespace Towerino
             _agent.destination = destination;
 
             LeanTween.scale(_visualAsset.gameObject, Vector3.one, 0.25f).setEase(LeanTweenType.easeOutQuad);
+            
+            GameMaster.Instance.Gameplay.UI.SetupEnemyHp(this);
         }
 
         // Set inactive and send it back to pooling system
         private void TurnOff(bool instant = false)
         {
+            _hpBar = null;
             if (_agent.enabled) _agent.isStopped = true;
             _agent.enabled = _collider.enabled = false;
             gameObject.SetActive(false);
@@ -136,6 +140,8 @@ namespace Towerino
             ReachedDestination = val;
             return this;
         }
+
+        public void SetHpBar(EnemyHpController hpBar) { _hpBar = hpBar; }
 
         // Apply damage to enemy
         public EnemyController ApplyDamage(float dmg)
@@ -175,6 +181,7 @@ namespace Towerino
         // When the enemy reached its destination we shrink it and the call TurnOff to do the rest
         public void DisposeReached()
         {
+            _hpBar.TurnOff();
             LeanTween.scale(_visualAsset.gameObject, Vector3.one * 1.25f, _reachedDuration * 0.33f).setEase(LeanTweenType.easeOutQuad).setOnComplete(() => {
                 LeanTween.scale(_visualAsset.gameObject, Vector3.zero, _reachedDuration * 0.66f).setEase(LeanTweenType.easeInQuad).setOnComplete(() => { TurnOff(); });
             });
@@ -183,6 +190,7 @@ namespace Towerino
         // If player killed this enemy we turn off collider and stop agent movement
         private void DisposeDeath()
         {
+            _hpBar.TurnOff();
             _agent.isStopped = true;
             _agent.enabled = _collider.enabled = false;
 

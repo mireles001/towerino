@@ -11,6 +11,7 @@ namespace Towerino
     {
         public float HeadStartDuration { get { return _headStartDuration; } }
         public float WaveEndWaitDuration { get { return _waveEndWaitDuration; } }
+        public Camera GamePlayCamera { get { return _camera; } }
         public PoolingSystem ActivePoolingSystem { get; private set; }
         public GameUIController UI { get { return _ui; } }
         public LevelController CurrentLevel { get { return _currentLevel; } }
@@ -18,6 +19,8 @@ namespace Towerino
 
         [SerializeField]
         private GameObject _cameraWrapper = null;
+        [SerializeField]
+        private Light _mainLight = null;
         [SerializeField]
         private float _headStartDuration = 5;
         [SerializeField]
@@ -255,10 +258,15 @@ namespace Towerino
             GameMaster.Instance.RemoveGamePlay();
         }
 
-        // TODO: Apply scene lighting override
+        // Retrieves from asigned Lighting SO asset to setup the lighting in current level
         public void ApplyLightConfig(ScenarioConfigSO config)
         {
-
+            _mainLight.transform.eulerAngles = config.lightRotation;
+            _mainLight.color = config.lightColor;
+            RenderSettings.subtractiveShadowColor = config.shadowColor;
+            RenderSettings.ambientSkyColor = config.skyColor;
+            RenderSettings.ambientEquatorColor = config.midColor;
+            RenderSettings.ambientGroundColor = config.lowColor;
         }
     }
 }

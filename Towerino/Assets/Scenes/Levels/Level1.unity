@@ -7327,7 +7327,7 @@ MonoBehaviour:
   _navPathRenderers:
   - {fileID: 809540957}
   - {fileID: 1024141930}
-  _lightConfiguration: {fileID: 0}
+  _lightConfiguration: {fileID: 11400000, guid: 43566c8f021a5f8448961cac8ddba39c, type: 2}
   _devLight: {fileID: 386561867}
 --- !u!1001 &716972148
 PrefabInstance:

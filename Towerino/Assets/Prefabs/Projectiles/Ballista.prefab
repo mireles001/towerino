@@ -224,9 +224,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _type: 0
-  _impactDamage: 4.5
+  _impactDamage: 4.3
   _damageRadius: 0
-  _speed: 20
+  _speed: 22.5
   _turnOffProjectileDuration: 0.15
   _autoKillTimer: 5
   _visualObject: {fileID: 5557456325875899782}

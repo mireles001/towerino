@@ -8,6 +8,7 @@ namespace Towerino
     {
         public Vector3 lightRotation;
         public Color lightColor;
+        public Color shadowColor;
         [ColorUsage(true, true)] public Color skyColor;
         [ColorUsage(true, true)] public Color midColor;
         [ColorUsage(true, true)] public Color lowColor;

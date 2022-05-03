@@ -83,7 +83,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rewardPerKill: 90
-  _hp: 80
+  _hp: 200
   _speed: 2.5
   _reachedDuration: 0.35
   _deathDuration: 1.25

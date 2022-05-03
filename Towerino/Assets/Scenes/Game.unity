@@ -649,7 +649,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 248326725}
   m_LocalRotation: {x: 0.62101585, y: 0.3046292, z: -0.15048479, w: 0.7063248}
-  m_LocalPosition: {x: -6.5, y: -14.5, z: 16.5}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 169537480}
@@ -1156,6 +1156,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraWrapper: {fileID: 1460939138}
+  _mainLight: {fileID: 248326726}
   _headStartDuration: 4
   _waveEndWaitDuration: 2
   _hits:
@@ -1191,6 +1192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb9f6b6934c57284d9ecc72c566cf6bf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _mainCanvas: {fileID: 657930869}
   _panelTweenDuration: 0.18
   _quitPanel: {fileID: 1301419528}
   _buySellPanel: {fileID: 1054515552}
@@ -1221,6 +1223,7 @@ MonoBehaviour:
   _announcer: {fileID: 824904961}
   _announcerLevel: {fileID: 1085598052}
   _announcerWave: {fileID: 2094016165}
+  _enemyHpBar: {fileID: 1793008489343282783, guid: bab1ce87a6c5474468a19a63faf7b508, type: 3}
 --- !u!114 &362981161
 MonoBehaviour:
   m_ObjectHideFlags: 0
