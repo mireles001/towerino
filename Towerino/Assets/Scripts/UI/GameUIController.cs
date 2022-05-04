@@ -235,7 +235,7 @@ namespace Towerino
         // TODO: Creating floating +$$$ UI
         public void RewardMoney(int money, Vector3 position)
         {
-            Debug.Log("Add floating +$$$ on top of focused item");
+            //Debug.Log("Add floating +$$$ on top of focused item");
         }
 
         public void SetupEnemyHp(EnemyController enemy)

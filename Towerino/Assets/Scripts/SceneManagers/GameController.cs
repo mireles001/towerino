@@ -27,6 +27,14 @@ namespace Towerino
         private float _waveEndWaitDuration = 3;
         [SerializeField, Tooltip("Attack hit shuffled sounds")]
         private AudioClip[] _hits = new AudioClip[0];
+        [SerializeField]
+        private AudioClip _towerBuy = null;
+        [SerializeField]
+        private AudioClip _towerSell = null;
+        [SerializeField]
+        private AudioClip _healthLoseHeart = null;
+        [SerializeField]
+        private AudioClip _healthLoseAllHearts = null;
 
         // IMPORTANT: These are the tower data structs, where we store what prefabs, human name and buy/sell prices
         // for each tower type
@@ -98,8 +106,7 @@ namespace Towerino
                     // Raycasting no TowerBase? We close everything!
                     else if (CurrentTowerSelection != null)
                     {
-                        CurrentTowerSelection.Deselect();
-                        UI.CloseBuySell();
+                        ReleaseTowerSelection();
                     }
                 }
             }
@@ -107,7 +114,7 @@ namespace Towerino
 
         public void ReleaseTowerSelection()
         {
-            CurrentTowerSelection.Deselect();
+            if (CurrentTowerSelection != null) CurrentTowerSelection.Deselect();
             UI.CloseBuySell();
             CurrentTowerSelection = null;
         }
@@ -162,7 +169,11 @@ namespace Towerino
         }
 
         // If user dies we just reset the same level
-        public void GameOver() { LoadCurrentLevel(); }
+        public void GameOver()
+        {
+            _music.PlayOneShot(_healthLoseAllHearts);
+            LoadCurrentLevel();
+        }
 
         // This function only request for an additive load scene, and does some animation to the camera
         // this is only for the looks. Ah! we also close UI in case user had Buy/Sell panel opened.
@@ -175,7 +186,7 @@ namespace Towerino
             }
             else _cameraWrapper.transform.position = _cameraWrapperMovePosition;
 
-            UI.CloseBuySell();
+            ReleaseTowerSelection();
             GameMaster.Instance.LoadCurrentLevel(this);
         }
 
@@ -205,6 +216,10 @@ namespace Towerino
             if (_hits.Length > 0) _music.PlayOneShot(_hits[Random.Range(0, _hits.Length - 1)]);
         }
 
+        public void PlayHeartSFX()
+        {
+            _music.PlayOneShot(_healthLoseHeart);
+        }
 
         // Modify player money and request UI update
         private void ModifyPlayerMoney(int addMoney)
@@ -225,6 +240,7 @@ namespace Towerino
             TowerData data = (TowerData)GetTowerData(towerType);
             if (CurrentTowerSelection.HasTower || _playerMoney < data.BuyPrice) return;
             ModifyPlayerMoney(-data.BuyPrice);
+            _music.PlayOneShot(_towerBuy);
             // Creates or pulls an inactive object from PoolingSystem
             CurrentTowerSelection.SetTower(ActivePoolingSystem.GetObject(data.Prefab).GetComponent<TowerController>());
             UI.CloseBuySell();
@@ -237,6 +253,7 @@ namespace Towerino
             TowerData data = (TowerData)GetTowerData(CurrentTowerSelection.TowerType);
             ModifyPlayerMoney(data.SellPrice);
             UI.RewardMoney(data.SellPrice, CurrentTowerSelection.GetHUDPosition());
+            _music.PlayOneShot(_towerSell);
             // Prepares to set inactive and return object to PoolingSystem
             CurrentTowerSelection.UnsetTower();
             UI.CloseBuySell();

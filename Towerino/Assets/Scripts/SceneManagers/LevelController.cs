@@ -123,6 +123,11 @@ namespace Towerino
                     {
                         _waveCleared = true;
                         _waveTimer = 0;
+
+                        if (GameMaster.Instance.Gameplay.CurrentTowerSelection != null)
+                        {
+                            GameMaster.Instance.Gameplay.ReleaseTowerSelection();
+                        }
                     }
                 }
             }
@@ -131,11 +136,6 @@ namespace Towerino
         private void StartNextWave()
         {
             _waveActive = _waveCleared = false;
-
-            if (GameMaster.Instance.Gameplay.CurrentTowerSelection != null)
-            {
-                GameMaster.Instance.Gameplay.ReleaseTowerSelection();
-            }
 
             // If we are out of waves, we move forward to the next level
             if (_currentWaveIndex == _enemyWaves.Length)
@@ -184,8 +184,9 @@ namespace Towerino
         public void EnemyReachedDestination(EnemyController enemy)
         {
             _health--;
-
+            GameMaster.Instance.Gameplay.PlayHeartSFX();
             GameMaster.Instance.Gameplay.UI.UpdateHealthMeter(_health);
+
             enemy.DisposeReached();
             RemoveEnemy();
 
