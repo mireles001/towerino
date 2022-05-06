@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 
 namespace Towerino
 {
@@ -11,6 +12,8 @@ namespace Towerino
         private RectTransform _firstTimeFader = null;
         [SerializeField]
         private RectTransform _title = null;
+        [SerializeField]
+        private TMP_Text _version = null;
 
         private bool _tweening;
 
@@ -32,6 +35,7 @@ namespace Towerino
         private void Start()
         {
             GameMaster.Instance.Initialize();
+            _version.text = $"v{Application.version}";
         }
 
         // Using LeanTween plugin to do some visual tweening in camera wrapper and title to make this flying movement
